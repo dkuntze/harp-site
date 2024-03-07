@@ -20,12 +20,12 @@
   --text-color: black;
 
   /* fonts */
-  --body-font-family: roboto, roboto-fallback;
-  --heading-font-family: var(--body-font-family);
+  --body-font-family: "montserrat", sans-serif;
+  --heading-font-family: "playfair-display", serif;
   --fixed-font-family: 'Roboto Mono', menlo, consolas, 'Liberation Mono', monospace;
 
   /* body sizes */
-  --body-font-size-m: 22px;
+  --body-font-size-m: 20px;
   --body-font-size-s: 18px;
   --body-font-size-xs: 16px;
 
@@ -38,7 +38,7 @@
   --heading-font-size-xs: 18px;
 
   /* nav height */
-  --nav-height: 64px;
+  --nav-height: 100px;
 }
 
 @font-face {
@@ -80,7 +80,7 @@ header {
 h1, h2, h3,
 h4, h5, h6 {
   font-family: var(--heading-font-family);
-  font-weight: 600;
+  font-weight: bold;
   line-height: 1.25;
   margin-top: 1em;
   margin-bottom: .5em;
@@ -133,27 +133,28 @@ a:hover {
 
 /* buttons */
 a.button:any-link, button {
-  font-family: var(--body-font-family);
+  font-family: montserrat, sans-serif;
   display: inline-block;
   box-sizing: border-box;
   text-decoration: none;
   border: 2px solid transparent;
-  padding: 5px 30px;
+  padding: 10px 30px;
   text-align: center;
-  font-style: normal;
-  font-weight: 600;
+  font-style:  normal;
+  font-size: 16px;
+  font-weight: normal;
   cursor: pointer;
-  color: var(--background-color);
-  background-color: var(--link-color);
+  color: #fff;
+  background-color: #000;
   margin: 16px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-radius: 30px;
 }
 
 a.button:hover, a.button:focus, button:hover, button:focus  {
-  background-color: var(--link-hover-color);
+  background-color: #fff;
+  color: #000;
   cursor: pointer;
 }
 
@@ -164,8 +165,9 @@ button:disabled, button:disabled:hover {
 
 a.button.secondary, button.secondary {
   background-color: unset;
-  border: 2px solid currentcolor;
-  color: var(--text-color)
+  border: 2px solid #000;
+  font-weight: normal;
+  color: #fff;
 }
 
 main img {
@@ -207,4 +209,27 @@ main .section {
 main .section.light,
 main .section.highlight {
   background-color: var(--light-color);
+}
+
+main .section.splash {
+  background: #DFECE4;
+  background: linear-gradient(120deg, #DFECE4 50%, #30BCC9 50%);
+}
+
+main .section.splash h1, main .section.splash h1+p {
+  text-align: center;
+}
+
+main .section.splash p.button-container {
+  display: inline-block;
+}
+
+main .section.splash > div {
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+main .section.splash > div > p:nth-child(3) {
+  padding-right: 25px;
 }
