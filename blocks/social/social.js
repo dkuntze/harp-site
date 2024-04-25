@@ -8,19 +8,22 @@ function buildIcon(name, block) {
     }
   });
   if (parentDiv) {
+    const config = readBlockConfig(block);
     const div = document.createElement('div');
+    const anchor = document.createElement('a');
+    anchor.href = config[name];
+    anchor.target = '_blank';
+    div.append(anchor);
     const span = document.createElement('span');
     span.classList.add('icon');
     span.classList.add(`icon-icons8-${name}`);
-    div.append(span);
+    anchor.append(span);
     parentDiv.replaceWith(div);
   }
   return parentDiv;
 }
 
 export default async function decorate(block) {
-  const config = readBlockConfig(block);
-
   const fb = buildIcon('facebook', block);
   buildIcon('youtube', block);
   buildIcon('instagram', block);
