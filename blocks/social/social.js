@@ -13,6 +13,7 @@ function buildIcon(name, block) {
     const anchor = document.createElement('a');
     anchor.href = config[name];
     anchor.target = '_blank';
+    anchor.setAttribute('aria-label', name);
     div.append(anchor);
     const span = document.createElement('span');
     span.classList.add('icon');
