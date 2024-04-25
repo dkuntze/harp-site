@@ -24,7 +24,7 @@ function buildIcon(name, block) {
 }
 
 export default async function decorate(block) {
-  const fb = buildIcon('facebook', block);
+  buildIcon('facebook', block);
   buildIcon('youtube', block);
   buildIcon('instagram', block);
   buildIcon('twitter', block);
