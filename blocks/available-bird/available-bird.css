@@ -1,0 +1,38 @@
+div.available-bird {
+    background-color: #30BCC9;
+    display: flex;
+}
+
+div.available-bird > div  {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+}
+
+div.available-bird div.copy {
+    padding: 20px;
+    color: #fff;
+}
+
+div.available-bird h3 {
+    padding-left: 20px;
+    font-size: 20px;
+    font-family: var(--body-font-family);
+    color: #fff;
+}
+
+@media only screen and (width <= 600px) {
+    div.available-bird  {
+        display: block;
+    }
+
+    div.available-bird h2 {
+        margin-top: 0;
+    }
+}
+
+@media only screen and (width <= 800px) {
+    div.available-bird div.copy {
+        font-size: 15px;
+    }
+}
