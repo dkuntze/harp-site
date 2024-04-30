@@ -11,14 +11,14 @@ div.available-bird > div  {
 
 div.available-bird div.copy {
     padding: 20px;
-    color: #fff;
+    color: #000;
 }
 
 div.available-bird h3 {
     padding-left: 20px;
     font-size: 20px;
     font-family: var(--body-font-family);
-    color: #fff;
+    color: #000;
 }
 
 @media only screen and (width <= 600px) {
