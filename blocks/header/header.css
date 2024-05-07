@@ -273,3 +273,9 @@ header nav .nav-sections ul > li > ul > li {
 header nav .nav-tools {
   grid-area: tools;
 }
+
+header nav .nav-tools > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1em;
+}
