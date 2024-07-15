@@ -279,3 +279,17 @@ header nav .nav-tools > div {
   justify-content: flex-end;
   gap: 1em;
 }
+
+@media (width <= 570px) {
+  header nav .nav-tools > div {
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header nav .nav-tools p.button-container > strong > a {
+    margin: 0;
+  }
+}
