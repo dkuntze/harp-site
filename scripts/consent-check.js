@@ -3,12 +3,12 @@ let consentedLoaded = false;
 /**
  * Dummy consent implementation.
  *
- * By default consent is declined, so consented scripts (analytics, martech, etc.)
- * are not loaded. This stands in for a real CMP and can be swapped out later.
+ * The site currently has no features that require consent, so consent is
+ * accepted by default. Replace this with a real CMP if that changes.
  *
  * The default can be overridden with a query parameter for testing:
  *   ?consent=accept   grant consent (loads consented.js)
- *   ?consent=decline  decline consent (default behavior)
+ *   ?consent=decline  decline consent
  * @returns {boolean} true if the user has consented
  */
 function hasConsent() {
@@ -16,7 +16,7 @@ function hasConsent() {
   if (consent !== null) {
     return ['accept', 'true', '1', 'yes'].includes(consent.toLowerCase());
   }
-  return false;
+  return true;
 }
 
 /**
