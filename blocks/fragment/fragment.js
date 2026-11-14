@@ -9,7 +9,7 @@ import {
 } from '../../scripts/scripts.js';
 
 import {
-  loadBlocks,
+  loadSections,
 } from '../../scripts/aem.js';
 
 /**
@@ -18,7 +18,7 @@ import {
  * @returns {HTMLElement} The root element of the fragment
  */
 export async function loadFragment(path) {
-  if (path && path.startsWith('/')) {
+  if (path && path.startsWith('/') && !path.startsWith('//')) {
     const resp = await fetch(`${path}.plain.html`);
     if (resp.ok) {
       const main = document.createElement('main');
@@ -34,7 +34,7 @@ export async function loadFragment(path) {
       resetAttributeBase('source', 'srcset');
 
       decorateMain(main);
-      await loadBlocks(main);
+      await loadSections(main);
       return main;
     }
   }
@@ -45,11 +45,17 @@ export default async function decorate(block) {
   const link = block.querySelector('a');
   const path = link ? link.getAttribute('href') : block.textContent.trim();
   const fragment = await loadFragment(path);
-  if (fragment) {
-    const fragmentSection = fragment.querySelector(':scope .section');
-    if (fragmentSection) {
-      block.closest('.section').classList.add(...fragmentSection.classList);
-      block.closest('.fragment').replaceWith(...fragment.childNodes);
-    }
+  if (!fragment) return;
+
+  const wrapper = block.closest('.fragment-wrapper');
+  const section = wrapper.closest('.section');
+
+  if (section && section.children.length === 1) {
+    section.replaceWith(...fragment.childNodes);
+  } else {
+    fragment.querySelectorAll(':scope > .section').forEach((fragmentSection) => {
+      [...fragmentSection.childNodes].forEach((child) => wrapper.before(child));
+    });
+    wrapper.remove();
   }
 }
