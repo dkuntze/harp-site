@@ -92,6 +92,9 @@ canonical URL (the production URL even when viewing an AEM preview) and omit que
 parameters and fragments. If clipboard access is unavailable, the page selects a
 read-only link for manual copying. Cancelling native sharing does not copy anything.
 There are no third-party sharing widgets, SDKs, or tracking requests.
+The controls use SVG icons: an upward arrow for sharing and a chain link for
+copying. Both retain screen-reader labels, hover tooltips, and keyboard focus
+indicators.
 
 No extra block fields are needed. AEM generates Open Graph and Twitter Card tags
 in the initial page HTML from the profile's **Title**, **Description**, and

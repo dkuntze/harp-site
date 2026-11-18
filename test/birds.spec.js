@@ -98,7 +98,7 @@ test('profile omits missing facts and handles a missing photo', async ({ page })
   await expectNoOverflow(page);
 });
 
-test('copy link uses the clean production canonical, not the preview URL', async ({ page }) => {
+test('copy link uses the clean production canonical, not the preview URL', async ({ page }, testInfo) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'share', { value: undefined });
     Object.defineProperty(navigator, 'clipboard', {
@@ -115,11 +115,16 @@ test('copy link uses the clean production canonical, not the preview URL', async
   await page.goto('/test/bird-profile?utm_source=social#care');
   const sharing = page.getByRole('group', { name: "Share Jon's profile" });
   await expect(sharing.getByRole('button', { name: 'Share profile' })).toHaveCount(0);
-  await sharing.getByRole('button', { name: 'Copy link' }).click();
+  const copy = sharing.getByRole('button', { name: 'Copy link' });
+  await copy.click();
+  await expect(copy).toHaveText('');
+  await expect(copy).toHaveAttribute('title', 'Copy link');
+  await expect.poll(() => copy.locator('img').evaluate((image) => image.naturalWidth)).toBeGreaterThan(0);
   await expect(sharing.getByRole('status')).toHaveText('Link copied.');
   expect(await page.evaluate(() => window.copiedProfileURL)).toBe(profileURL);
   await expect(sharing.getByRole('textbox', { name: 'Profile link' })).toBeHidden();
   await expectNoOverflow(page);
+  await sharing.screenshot({ path: testInfo.outputPath('sharing-copy-icon.png') });
 });
 
 test('native sharing retains focus, blocks repeat activation, and handles cancellation', async ({ page }, testInfo) => {
@@ -145,6 +150,9 @@ test('native sharing retains focus, blocks repeat activation, and handles cancel
   const sharing = page.getByRole('group', { name: "Share Jon's profile" });
   const share = sharing.getByRole('button', { name: 'Share profile' });
   await share.focus();
+  await expect(share).toHaveText('');
+  await expect(share).toHaveAttribute('title', 'Share profile');
+  await expect.poll(() => share.locator('img').evaluate((image) => image.naturalWidth)).toBeGreaterThan(0);
   await share.press('Enter');
   await page.evaluate(() => new Promise((resolve) => {
     requestAnimationFrame(() => requestAnimationFrame(resolve));

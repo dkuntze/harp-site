@@ -1,4 +1,4 @@
-import { getMetadata } from '../../scripts/aem.js';
+import { decorateIcons, getMetadata } from '../../scripts/aem.js';
 import {
   ADOPTION_APPLICATION_URL,
   BIRD_LISTING_PATH,
@@ -44,6 +44,18 @@ function getProfileURL() {
   return url.href;
 }
 
+function createSharingButton(label, iconName) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.setAttribute('aria-label', label);
+  button.title = label;
+  const icon = document.createElement('span');
+  icon.className = `icon icon-${iconName}`;
+  icon.setAttribute('aria-hidden', 'true');
+  button.append(icon);
+  return button;
+}
+
 function createSharing(name, summary) {
   const sharing = document.createElement('div');
   sharing.className = 'bird-sharing';
@@ -85,9 +97,7 @@ function createSharing(name, summary) {
   };
 
   if (typeof navigator.share === 'function') {
-    const share = document.createElement('button');
-    share.type = 'button';
-    share.textContent = 'Share profile';
+    const share = createSharingButton('Share profile', 'share');
     share.addEventListener('click', async () => {
       if (share.getAttribute('aria-disabled') === 'true') return;
       share.setAttribute('aria-disabled', 'true');
@@ -102,12 +112,11 @@ function createSharing(name, summary) {
     });
     controls.append(share);
   }
-  const copy = document.createElement('button');
-  copy.type = 'button';
-  copy.textContent = 'Copy link';
+  const copy = createSharingButton('Copy link', 'link');
   copy.addEventListener('click', copyLink);
   controls.append(copy);
   sharing.append(label, controls, manualLink, message);
+  decorateIcons(sharing);
   return sharing;
 }
 

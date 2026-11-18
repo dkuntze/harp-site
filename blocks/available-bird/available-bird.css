@@ -155,20 +155,25 @@ main .available-bird .bird-sharing-controls {
 }
 
 main .available-bird .bird-sharing button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
   min-height: 44px;
-  max-width: 100%;
-  padding: 10px 16px;
+  padding: 10px;
   margin: 0;
-  border: 1px solid var(--bird-accent);
-  border-radius: 4px;
-  background: white;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bird-mist);
   color: var(--bird-accent);
-  font-size: 14px;
-  white-space: normal;
+}
+
+main .available-bird .bird-sharing .icon img {
+  display: block;
 }
 
 main .available-bird .bird-sharing button:hover {
-  background: var(--bird-mist);
+  background: #d5e0d9;
 }
 
 main .available-bird .bird-sharing button[aria-disabled="true"] {
