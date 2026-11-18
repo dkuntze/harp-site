@@ -72,7 +72,7 @@ Use exactly one of these adoption statuses (case does not matter):
 | Status | Listing | Profile |
 | --- | --- | --- |
 | Available | Shown | Application link |
-| Pending | Shown with pending label | No application link |
+| Pending or Adoption pending | Shown when "Include pending adoptions" is on | No application link |
 | Adopted | Removed | Adopted message and link to other birds |
 
 Blank or unrecognized statuses hide the profile from the listing and suppress the
@@ -118,7 +118,11 @@ At `/adoption/available-birds`, keep a page title, brief introduction, service a
 and link to `/adoption/requirements`. Replace the old biographies with a one-column
 table named **Bird Listing**, containing a single link to `/bird-index.json`.
 No per-bird entries or duplicated summaries are needed. The listing sorts by name
-and includes search, a species filter, and available/pending status labels.
+and includes search, a species filter, and available/pending status labels. It
+shows Available birds by default. Visitors can turn on **Include pending
+adoptions** to also see birds marked Pending or Adoption pending; search and
+species selections still apply. Clear filters resets the toggle to off. Adopted,
+missing/unknown-status, and noindex/none profiles remain excluded in both views.
 
 ### Index setup and rollout
 
@@ -152,22 +156,12 @@ and includes search, a species filter, and available/pending status labels.
 Production content and Configuration Service settings are separate from this code
 repository and are not changed by deploying the blocks.
 
-### Browser tests and local examples
+### Local development
 
 ```sh
-npx playwright install chromium
-aem up --no-open --no-stop-other --url https://www.heartlandavianrescueproject.org \
-  --html-folder test/fixtures --html-mount /test
-# In another terminal:
-npm test
+aem up
 npm run lint
 ```
 
-Local examples: `/test/bird-profile`, `/test/available-birds`, and
-`/test/legacy-bird`. The local listing links to `/test/fixtures/bird-index.json`
-for a manual preview without an activated index; never publish that fixture link.
-Browser tests intercept the index request and cover pagination, status exclusions,
-errors/retry, and filtering at mobile/tablet/desktop sizes.
-Fixture profiles include excerpts of existing biographies and test-only statuses;
-they are not complete migration documents. Tests and fixtures are excluded from
-Edge Delivery code delivery by `.hlxignore`.
+Validate `/adoption/available-birds` and individual bird profiles on the local
+server at mobile, tablet, and desktop widths using published content.
