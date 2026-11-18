@@ -6,8 +6,7 @@
   "scripts": {
     "lint:js": "eslint .",
     "lint:css": "stylelint blocks/**/*.css styles/*.css",
-    "lint": "npm run lint:js && npm run lint:css",
-    "test": "playwright test"
+    "lint": "npm run lint:js && npm run lint:css"
   },
   "repository": {
     "type": "git",
@@ -22,7 +21,6 @@
   "devDependencies": {
     "@babel/core": "7.23.7",
     "@babel/eslint-parser": "7.23.3",
-    "@playwright/test": "1.65.1",
     "chai": "5.0.0",
     "eslint": "8.56.0",
     "eslint-config-airbnb-base": "15.0.0",

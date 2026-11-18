@@ -43,6 +43,57 @@ main .bird-listing select {
   font-size: 16px;
 }
 
+main .bird-listing .bird-pending-field {
+  grid-column: 1 / -1;
+}
+
+main .bird-listing .bird-pending-toggle {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 12px;
+  min-height: 48px;
+  cursor: pointer;
+}
+
+main .bird-listing .bird-pending-toggle input {
+  appearance: none;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 26px;
+  min-height: 26px;
+  padding: 3px;
+  margin: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+main .bird-listing .bird-pending-toggle input::before {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #52635b;
+  content: "";
+}
+
+main .bird-listing .bird-pending-toggle input:checked {
+  border-color: var(--bird-accent);
+  background: var(--bird-accent);
+}
+
+main .bird-listing .bird-pending-toggle input:checked::before {
+  background: white;
+  transform: translateX(18px);
+}
+
+main .bird-listing .bird-filter-hint {
+  margin: 0;
+  color: #52635b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 main .bird-listing :is(input, select, button, a):focus-visible {
   outline: 3px solid var(--bird-accent);
   outline-offset: 4px;

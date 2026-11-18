@@ -116,7 +116,18 @@ function renderListing(block, birds) {
       species.append(option);
     });
   speciesField.append(speciesLabel, species);
-  controls.append(searchField, speciesField);
+  const pendingField = createElement('div', 'bird-filter-field bird-pending-field');
+  const pendingLabel = createElement('label', 'bird-pending-toggle');
+  const includePending = createElement('input');
+  includePending.type = 'checkbox';
+  includePending.id = `bird-include-pending-${listingId}`;
+  includePending.setAttribute('role', 'switch');
+  const pendingHint = createElement('p', 'bird-filter-hint', 'Also show birds whose adoptions are in progress.');
+  pendingHint.id = `bird-pending-hint-${listingId}`;
+  includePending.setAttribute('aria-describedby', pendingHint.id);
+  pendingLabel.append(includePending, createElement('span', '', 'Include pending adoptions'));
+  pendingField.append(pendingLabel, pendingHint);
+  controls.append(searchField, speciesField, pendingField);
 
   const count = createElement('p', 'bird-result-count');
   count.setAttribute('role', 'status');
@@ -134,25 +145,35 @@ function renderListing(block, birds) {
 
   const update = () => {
     const query = search.value.trim().toLowerCase();
+    const filtered = Boolean(query || species.value);
     let visible = 0;
     items.forEach(({ bird, card }) => {
       const haystack = `${bird.name} ${bird.species} ${bird.description}`.toLowerCase();
-      const matches = haystack.includes(query)
+      const status = getAdoptionStatus(bird.status);
+      const matches = (status.canApply || includePending.checked)
+        && haystack.includes(query)
         && (!species.value || bird.species === species.value);
       card.hidden = !matches;
       if (matches) visible += 1;
     });
     count.textContent = `${visible} ${visible === 1 ? 'bird' : 'birds'} ${query || species.value ? 'found' : 'to meet'}`;
     empty.hidden = visible > 0;
-    emptyTitle.textContent = birds.length ? 'No birds match just yet' : 'No birds listed right now';
-    emptyCopy.textContent = birds.length
-      ? 'Try another name or species, or clear your filters to meet everyone.'
-      : 'Please check back for birds ready for adoption.';
-    reset.hidden = !birds.length;
+    if (filtered) {
+      emptyTitle.textContent = 'No birds match just yet';
+      emptyCopy.textContent = 'Try another name or species, or clear your filters to meet everyone.';
+    } else if (birds.length) {
+      emptyTitle.textContent = 'No birds available right now';
+      emptyCopy.textContent = 'Turn on "Include pending adoptions" to see birds whose adoptions are in progress.';
+    } else {
+      emptyTitle.textContent = 'No birds listed right now';
+      emptyCopy.textContent = 'Please check back for birds ready for adoption.';
+    }
+    reset.hidden = !filtered;
     controls.hidden = !birds.length;
   };
   search.addEventListener('input', update);
   species.addEventListener('change', update);
+  includePending.addEventListener('change', update);
   reset.addEventListener('click', () => {
     controls.reset();
     update();
