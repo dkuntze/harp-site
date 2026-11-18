@@ -1,0 +1,47 @@
+{
+  "total": 5,
+  "offset": 0,
+  "limit": 500,
+  "data": [
+    {
+      "path": "/adoption/birds/jon",
+      "name": "Jon",
+      "species": "Green cheek conure",
+      "age": "About 2 years",
+      "fee": "$200",
+      "status": "Available",
+      "description": "A curious young conure who enjoys music, follows his foster from room to room, and needs a patient family to help him build trust.",
+      "image": "https://www.heartlandavianrescueproject.org/adoption/media_18cc361fb4adece72fe5c61f802912a72fe1e2c44.png"
+    },
+    {
+      "path": "/adoption/birds/general",
+      "name": "General",
+      "species": "Military macaw",
+      "age": "About 25 years",
+      "fee": "$600",
+      "status": "Available",
+      "description": "A gentle military macaw who enjoys family life, individual attention, and time out of his cage.",
+      "image": "https://www.heartlandavianrescueproject.org/adoption/media_14a1c9c2caff388aaa87ae16222696c586be0d485.png"
+    },
+    {
+      "path": "/adoption/birds/pending-test",
+      "name": "Pending profile (test)",
+      "species": "Conure",
+      "status": "Pending",
+      "description": "Test-only profile awaiting an adoption decision."
+    },
+    {
+      "path": "/adoption/birds/adopted-test",
+      "name": "Adopted profile (test)",
+      "species": "Macaw",
+      "status": "Adopted"
+    },
+    {
+      "path": "/adoption/birds/noindex-test",
+      "name": "Hidden profile (test)",
+      "species": "Macaw",
+      "status": "Available",
+      "robots": "noindex, nofollow"
+    }
+  ]
+}

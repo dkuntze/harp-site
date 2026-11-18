@@ -10,6 +10,12 @@ module.exports = {
     sourceType: 'module',
     requireConfigFile: false,
   },
+  overrides: [{
+    files: ['playwright.config.js'],
+    rules: {
+      'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    },
+  }],
   rules: {
     // allow reassigning param
     'no-param-reassign': [2, { props: false }],

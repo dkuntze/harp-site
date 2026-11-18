@@ -1,38 +1,154 @@
-div.available-bird {
-    background-color: #30BCC9;
-    display: flex;
+main .available-bird {
+  --bird-ink: #163d39;
+  --bird-accent: #186c65;
+  --bird-mist: #edf5f0;
+
+  color: var(--bird-ink);
+  overflow-wrap: anywhere;
 }
 
-div.available-bird > div  {
-    display: flex;
-    flex-direction: column;
-    flex-basis: 100%;
+main .available-bird .bird-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+  font-size: 15px;
 }
 
-div.available-bird div.copy {
-    padding: 20px;
-    color: #000;
+main .available-bird .bird-breadcrumb span::before {
+  content: "/";
+  margin-right: 12px;
+  color: #64736d;
 }
 
-div.available-bird h3 {
-    padding-left: 20px;
-    font-size: 20px;
-    font-family: var(--body-font-family);
-    color: #000;
+main .available-bird .bird-overview,
+main .available-bird.legacy {
+  display: grid;
+  gap: 28px;
+  align-items: start;
 }
 
-@media only screen and (width <= 600px) {
-    div.available-bird  {
-        display: block;
-    }
-
-    div.available-bird h2 {
-        margin-top: 0;
-    }
+main .available-bird .bird-photo {
+  background: var(--bird-mist);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-@media only screen and (width <= 800px) {
-    div.available-bird div.copy {
-        font-size: 15px;
-    }
+main .available-bird .bird-photo img {
+  display: block;
+  width: 100%;
+}
+
+main .available-bird.profile .bird-photo img {
+  max-height: 420px;
+  object-fit: contain;
+}
+
+main .available-bird .bird-introduction {
+  min-width: 0;
+  font-size: var(--body-font-size-s);
+}
+
+main .available-bird h1,
+main .available-bird h2 {
+  margin-top: 0;
+  color: var(--bird-ink);
+}
+
+main .available-bird .bird-status {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin: 0 0 20px;
+  background: var(--bird-mist);
+  color: var(--bird-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+main .available-bird .status-pending {
+  background: #fff1d6;
+  color: #704b0c;
+}
+
+main .available-bird .bird-species {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+main .available-bird .bird-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 32px;
+  padding: 24px 0;
+  margin: 24px 0 0;
+  border-block: 1px solid #d5e0d9;
+}
+
+main .available-bird .bird-facts:empty {
+  display: none;
+}
+
+main .available-bird .bird-facts dt {
+  font-size: 13px;
+  color: #52635b;
+}
+
+main .available-bird .bird-facts dd {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+main .available-bird.legacy .bird-facts {
+  padding: 20px;
+  margin: 0;
+  border: 0;
+}
+
+main .available-bird .bird-actions .button {
+  max-width: 100%;
+  margin: 24px 0 8px;
+  border-radius: 5px;
+  background: var(--bird-accent);
+  color: white;
+  white-space: normal;
+}
+
+main .available-bird .bird-actions .button:hover {
+  background: var(--bird-ink);
+}
+
+main .available-bird .bird-adoption-note {
+  margin-top: 12px;
+  color: #52635b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+main .available-bird a:any-link {
+  color: var(--bird-accent);
+}
+
+main .available-bird a:focus-visible {
+  outline: 3px solid var(--bird-accent);
+  outline-offset: 5px;
+}
+
+main .available-bird-wrapper:has(> .profile) + .default-content-wrapper {
+  max-width: 760px;
+  margin: 48px auto 0;
+}
+
+@media (width >= 768px) {
+  main .available-bird.profile .bird-photo img {
+    max-height: 640px;
+  }
+
+  main .available-bird .bird-overview,
+  main .available-bird.legacy {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 48px;
+  }
 }

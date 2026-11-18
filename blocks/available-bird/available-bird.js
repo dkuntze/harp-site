@@ -1,36 +1,154 @@
-import { readBlockConfig } from '../../scripts/aem.js';
+import { getMetadata } from '../../scripts/aem.js';
+import {
+  ADOPTION_APPLICATION_URL,
+  BIRD_LISTING_PATH,
+  getAdoptionStatus,
+} from '../../scripts/birds.js';
 
-export default async function decorate(block) {
-  const config = readBlockConfig(block);
-  const mainDiv = document.createElement('div');
-  mainDiv.classList.add('available-bird');
-  const imageDiv = document.createElement('div');
-  const adoptionFee = document.createElement('h3');
-  if (config['adoption-fee']) {
-    adoptionFee.innerHTML = `Adoption Fee: ${config['adoption-fee']}`;
+function createLink(href, text, className = '') {
+  const link = document.createElement('a');
+  link.href = href;
+  link.textContent = text;
+  link.className = className;
+  return link;
+}
+
+function createFacts(facts) {
+  const list = document.createElement('dl');
+  list.className = 'bird-facts';
+  facts.forEach(([label, value]) => {
+    if (!value) return;
+    const item = document.createElement('div');
+    const term = document.createElement('dt');
+    const description = document.createElement('dd');
+    term.textContent = label;
+    description.textContent = value;
+    item.append(term, description);
+    list.append(item);
+  });
+  return list;
+}
+
+function addPageSchema(block, name, summary, image) {
+  const schema = document.createElement('script');
+  schema.type = 'application/ld+json';
+  schema.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: getMetadata('og:title') || document.title || name,
+    url: document.querySelector('link[rel="canonical"]')?.href
+      || `${window.location.origin}${window.location.pathname}`,
+    description: getMetadata('description') || summary,
+    about: {
+      '@type': 'Thing',
+      name,
+      description: [getMetadata('bird-species'), summary].filter(Boolean).join('. '),
+      ...(image ? { image: image.src } : {}),
+    },
+  }).replace(/</g, '\\u003c');
+  block.append(schema);
+}
+
+/**
+ * Supports the original key/value biographies while profiles move to separate pages.
+ */
+function decorateLegacy(block, fields) {
+  block.classList.add('legacy');
+  const photo = document.createElement('div');
+  photo.className = 'bird-photo';
+  const image = fields.get('image')?.querySelector('picture, img');
+  if (image) photo.append(image);
+  const copy = document.createElement('div');
+  copy.className = 'bird-introduction';
+  const heading = document.createElement('h2');
+  heading.textContent = fields.get('name')?.textContent.trim() || 'Meet this bird';
+  const img = photo.querySelector('img');
+  if (img && !img.alt) img.alt = heading.textContent;
+  const fee = fields.get('adoption fee')?.textContent.trim();
+  if (fee) photo.append(createFacts([['Adoption fee', fee]]));
+  copy.append(heading);
+  const biography = fields.get('text');
+  if (biography) copy.append(...biography.childNodes);
+  block.replaceChildren(photo, copy);
+}
+
+/**
+ * Decorates a photo + introduction profile, leaving the full story as ordinary page content.
+ */
+export default function decorate(block) {
+  const fields = new Map([...block.children]
+    .filter((row) => row.children.length === 2)
+    .map((row) => [row.children[0].textContent.trim().toLowerCase(), row.children[1]]));
+  if (fields.has('name') || fields.has('text')) {
+    decorateLegacy(block, fields);
+    return;
   }
-  const copyDiv = document.createElement('div');
-  const h2 = document.createElement('h2');
-  const copyP = document.createElement('p');
-  h2.innerHTML = config.name;
-  copyDiv.appendChild(h2);
-  // this detects if its an array of paragraphs or just a single paragraph
-  if (Array.isArray(config.text)) {
-    config.text.forEach((text) => {
-      const p = document.createElement('p');
-      p.innerHTML = text;
-      copyDiv.appendChild(p);
-    });
+
+  const row = block.firstElementChild;
+  const image = row?.children[0]?.querySelector('picture, img');
+  const content = row?.children[1];
+  const heading = content?.querySelector('h1, h2');
+  const name = heading?.textContent.trim() || 'this bird';
+  const summary = content?.querySelector('p')?.textContent.trim() || '';
+  const status = getAdoptionStatus(getMetadata('adoption-status'));
+  block.classList.add('profile');
+
+  const breadcrumb = document.createElement('nav');
+  breadcrumb.className = 'bird-breadcrumb';
+  breadcrumb.setAttribute('aria-label', 'Breadcrumb');
+  breadcrumb.append(createLink(BIRD_LISTING_PATH, 'All available birds'));
+  const current = document.createElement('span');
+  current.setAttribute('aria-current', 'page');
+  current.textContent = name;
+  breadcrumb.append(current);
+
+  const photo = document.createElement('div');
+  photo.className = 'bird-photo';
+  if (image) photo.append(image);
+  else photo.textContent = 'Photo coming soon';
+
+  const copy = document.createElement('div');
+  copy.className = 'bird-introduction';
+  const badge = document.createElement('p');
+  badge.className = `bird-status status-${status.value}`;
+  badge.textContent = status.label;
+  copy.append(badge);
+  const species = getMetadata('bird-species');
+  if (species) {
+    const subtitle = document.createElement('p');
+    subtitle.className = 'bird-species';
+    subtitle.textContent = species;
+    copy.append(subtitle);
+  }
+  if (content) copy.append(...content.childNodes);
+  copy.append(createFacts([
+    ['Age', getMetadata('bird-age')],
+    ['Sex', getMetadata('bird-sex')],
+    ['Adoption fee', getMetadata('adoption-fee')],
+  ]));
+
+  const actions = document.createElement('div');
+  actions.className = 'bird-actions';
+  if (status.canApply) {
+    actions.append(createLink(ADOPTION_APPLICATION_URL, `Apply to adopt ${name}`, 'button'));
   } else {
-    copyP.innerHTML = config.text;
+    const message = document.createElement('p');
+    message.textContent = status.value === 'adopted'
+      ? `${name} has found a home. Meet the birds still looking for theirs.`
+      : 'Applications are not currently open for this bird.';
+    actions.append(message, createLink(BIRD_LISTING_PATH, 'Meet other birds', 'button'));
   }
-  copyDiv.classList.add('copy');
-  copyDiv.append(copyP);
-  const image = document.createElement('img');
-  image.src = config.image;
-  imageDiv.appendChild(image);
-  imageDiv.append(adoptionFee);
-  mainDiv.appendChild(imageDiv);
-  mainDiv.appendChild(copyDiv);
-  block.replaceWith(mainDiv);
+  const note = document.createElement('p');
+  note.className = 'bird-adoption-note';
+  note.append(
+    'Serving the Lincoln, Omaha, and Council Bluffs metro areas. ',
+    createLink('/adoption/requirements', 'Read our adoption requirements'),
+    '. Please wait for adoption approval before purchasing a cage.',
+  );
+  copy.append(actions, note);
+  const overview = document.createElement('div');
+  overview.className = 'bird-overview';
+  overview.append(photo, copy);
+  block.replaceChildren(breadcrumb, overview);
+  addPageSchema(block, name, summary, photo.querySelector('img'));
 }

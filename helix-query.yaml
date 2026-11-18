@@ -1,0 +1,34 @@
+version: 1
+indices:
+  birds:
+    include:
+      - /adoption/birds/**
+    target: /bird-index.json
+    properties:
+      name:
+        selectFirst: main .available-bird h1
+        value: textContent(el)
+      description:
+        selectFirst: main .available-bird h1 + p
+        value: textContent(el)
+      image:
+        selectFirst: main .available-bird img
+        value: attribute(el, "src")
+      species:
+        select: head > meta[name="bird-species"]
+        value: attribute(el, "content")
+      age:
+        select: head > meta[name="bird-age"]
+        value: attribute(el, "content")
+      fee:
+        select: head > meta[name="adoption-fee"]
+        value: attribute(el, "content")
+      status:
+        select: head > meta[name="adoption-status"]
+        value: attribute(el, "content")
+      robots:
+        select: head > meta[name="robots"]
+        value: attribute(el, "content")
+      lastModified:
+        select: none
+        value: parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
