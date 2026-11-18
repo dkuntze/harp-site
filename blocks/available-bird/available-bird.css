@@ -171,7 +171,7 @@ main .available-bird .bird-sharing button:hover {
   background: var(--bird-mist);
 }
 
-main .available-bird .bird-sharing button:disabled {
+main .available-bird .bird-sharing button[aria-disabled="true"] {
   background: var(--bird-mist);
   cursor: wait;
 }

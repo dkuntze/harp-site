@@ -122,12 +122,19 @@ test('copy link uses the clean production canonical, not the preview URL', async
   await expectNoOverflow(page);
 });
 
-test('native sharing uses social metadata and cancellation does not copy', async ({ page }) => {
+test('native sharing retains focus, blocks repeat activation, and handles cancellation', async ({ page }, testInfo) => {
   await page.addInitScript(() => {
+    window.shareCalls = 0;
     Object.defineProperty(navigator, 'share', {
-      value: async (data) => {
+      value: (data) => {
+        window.shareCalls += 1;
         window.sharedProfile = data;
-        if (window.cancelSharing) throw new DOMException('Cancelled', 'AbortError');
+        return new Promise((resolve, reject) => {
+          window.completeSharing = () => {
+            if (window.cancelSharing) reject(new DOMException('Cancelled', 'AbortError'));
+            else resolve();
+          };
+        });
       },
     });
     Object.defineProperty(navigator, 'clipboard', {
@@ -137,16 +144,31 @@ test('native sharing uses social metadata and cancellation does not copy', async
   await page.goto('/test/bird-profile?utm_source=social#care');
   const sharing = page.getByRole('group', { name: "Share Jon's profile" });
   const share = sharing.getByRole('button', { name: 'Share profile' });
-  await share.click();
+  await share.focus();
+  await share.press('Enter');
+  await page.evaluate(() => new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  }));
+  await expect(share).toBeFocused();
+  await expect(share).toBeDisabled();
+  await share.press('Enter');
+  expect(await page.evaluate(() => window.shareCalls)).toBe(1);
+  await page.evaluate(() => window.completeSharing());
   await expect(share).toBeEnabled();
+  await expect(share).toBeFocused();
   expect(await page.evaluate(() => window.sharedProfile)).toEqual({
     title: 'Meet Jon, a green cheek conure | HARP',
     text: 'Meet Jon, a young green cheek conure looking for a patient home through HARP in the Omaha, Lincoln, and Council Bluffs area.',
     url: profileURL,
   });
+  await sharing.screenshot({ path: testInfo.outputPath('sharing-keyboard-focus.png') });
   await page.evaluate(() => { window.cancelSharing = true; });
-  await share.click();
+  await share.press('Enter');
+  expect(await page.evaluate(() => window.shareCalls)).toBe(2);
+  await expect(share).toBeFocused();
+  await page.evaluate(() => window.completeSharing());
   await expect(share).toBeEnabled();
+  await expect(share).toBeFocused();
   expect(await page.evaluate(() => window.copiedProfileURL)).toBeUndefined();
   await expect(sharing.getByRole('status')).toBeEmpty();
   await sharing.getByRole('button', { name: 'Copy link' }).click();

@@ -89,14 +89,15 @@ function createSharing(name, summary) {
     share.type = 'button';
     share.textContent = 'Share profile';
     share.addEventListener('click', async () => {
-      share.disabled = true;
+      if (share.getAttribute('aria-disabled') === 'true') return;
+      share.setAttribute('aria-disabled', 'true');
       message.textContent = '';
       try {
         await navigator.share(data);
       } catch (error) {
         if (error.name !== 'AbortError') await copyLink();
       } finally {
-        share.disabled = false;
+        share.removeAttribute('aria-disabled');
       }
     });
     controls.append(share);
