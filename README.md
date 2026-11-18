@@ -84,6 +84,34 @@ The current key/value Available Bird blocks still work during migration, includi
 their separate Apply Now links. Do not copy those old application links below new
 profiles: the new profile supplies the appropriate action based on status.
 
+### Sharing a profile
+
+Individual profiles include **Copy link** and, when supported by the browser,
+**Share profile** to open the device's native share sheet. Links use the page's
+canonical URL (the production URL even when viewing an AEM preview) and omit query
+parameters and fragments. If clipboard access is unavailable, the page selects a
+read-only link for manual copying. Cancelling native sharing does not copy anything.
+There are no third-party sharing widgets, SDKs, or tracking requests.
+The controls use SVG icons: an upward arrow for sharing and a chain link for
+copying. Both retain screen-reader labels, hover tooltips, and keyboard focus
+indicators.
+
+No extra block fields are needed. AEM generates Open Graph and Twitter Card tags
+in the initial page HTML from the profile's **Title**, **Description**, and
+**Image** metadata (or its first photo). These server-generated tags, not the
+sharing buttons or client-side structured data, control previews on social sites
+and messaging apps. Keep titles/descriptions specific to the bird and its current
+adoption status.
+
+Before sharing publicly, publish the profile and its photo and check the production
+URL. Confirm the HTML source contains `og:title`, `og:description`, `og:url`,
+`og:image`, and `twitter:card` (`summary_large_image`), and that the image is publicly
+accessible. An optional dedicated Image metadata value can use a landscape social
+image with the bird centered to accommodate preview cropping. Social platforms
+cache previews; use their preview/debugging tools to refresh them after updates.
+AEM preview hosts deliberately send `noindex, nofollow`; share the canonical
+production link, not an `aem.page` URL.
+
 ### Automatic listing
 
 At `/adoption/available-birds`, keep a page title, brief introduction, service area,

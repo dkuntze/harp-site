@@ -1,4 +1,4 @@
-import { getMetadata } from '../../scripts/aem.js';
+import { decorateIcons, getMetadata } from '../../scripts/aem.js';
 import {
   ADOPTION_APPLICATION_URL,
   BIRD_LISTING_PATH,
@@ -29,6 +29,97 @@ function createFacts(facts) {
   return list;
 }
 
+function getProfileURL() {
+  let url = new URL(window.location.href);
+  const preferred = document.querySelector('link[rel="canonical"]')?.href
+    || getMetadata('og:url') || url.href;
+  try {
+    const canonical = new URL(preferred, url);
+    if (['https:', 'http:'].includes(canonical.protocol)) url = canonical;
+  } catch {
+    // A malformed canonical must not prevent sharing the current profile.
+  }
+  url.search = '';
+  url.hash = '';
+  return url.href;
+}
+
+function createSharingButton(label, iconName) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.setAttribute('aria-label', label);
+  button.title = label;
+  const icon = document.createElement('span');
+  icon.className = `icon icon-${iconName}`;
+  icon.setAttribute('aria-hidden', 'true');
+  button.append(icon);
+  return button;
+}
+
+function createSharing(name, summary) {
+  const sharing = document.createElement('div');
+  sharing.className = 'bird-sharing';
+  sharing.setAttribute('role', 'group');
+  sharing.setAttribute('aria-label', `Share ${name}'s profile`);
+  const label = document.createElement('p');
+  label.className = 'bird-sharing-label';
+  label.textContent = `Share ${name}'s profile`;
+  const controls = document.createElement('div');
+  controls.className = 'bird-sharing-controls';
+  const message = document.createElement('p');
+  message.className = 'bird-sharing-status';
+  message.setAttribute('role', 'status');
+  message.setAttribute('aria-live', 'polite');
+  const manualLink = document.createElement('input');
+  manualLink.type = 'url';
+  manualLink.readOnly = true;
+  manualLink.hidden = true;
+  manualLink.setAttribute('aria-label', 'Profile link');
+  const data = {
+    title: getMetadata('og:title') || document.title || name,
+    text: getMetadata('og:description') || getMetadata('description') || summary,
+    url: getProfileURL(),
+  };
+  manualLink.value = data.url;
+
+  const copyLink = async () => {
+    message.textContent = '';
+    try {
+      await navigator.clipboard.writeText(data.url);
+      manualLink.hidden = true;
+      message.textContent = 'Link copied.';
+    } catch {
+      manualLink.hidden = false;
+      manualLink.focus();
+      manualLink.select();
+      message.textContent = 'Copy the selected link to share this profile.';
+    }
+  };
+
+  if (typeof navigator.share === 'function') {
+    const share = createSharingButton('Share profile', 'share');
+    share.addEventListener('click', async () => {
+      if (share.getAttribute('aria-disabled') === 'true') return;
+      share.setAttribute('aria-disabled', 'true');
+      message.textContent = '';
+      try {
+        await navigator.share(data);
+      } catch (error) {
+        if (error.name !== 'AbortError') await copyLink();
+      } finally {
+        share.removeAttribute('aria-disabled');
+      }
+    });
+    controls.append(share);
+  }
+  const copy = createSharingButton('Copy link', 'link');
+  copy.addEventListener('click', copyLink);
+  controls.append(copy);
+  sharing.append(label, controls, manualLink, message);
+  decorateIcons(sharing);
+  return sharing;
+}
+
 function addPageSchema(block, name, summary, image) {
   const schema = document.createElement('script');
   schema.type = 'application/ld+json';
@@ -36,8 +127,7 @@ function addPageSchema(block, name, summary, image) {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: getMetadata('og:title') || document.title || name,
-    url: document.querySelector('link[rel="canonical"]')?.href
-      || `${window.location.origin}${window.location.pathname}`,
+    url: getProfileURL(),
     description: getMetadata('description') || summary,
     about: {
       '@type': 'Thing',
@@ -145,7 +235,7 @@ export default function decorate(block) {
     createLink('/adoption/requirements', 'Read our adoption requirements'),
     '. Please wait for adoption approval before purchasing a cage.',
   );
-  copy.append(actions, note);
+  copy.append(actions, note, createSharing(name, summary));
   const overview = document.createElement('div');
   overview.className = 'bird-overview';
   overview.append(photo, copy);

@@ -131,9 +131,79 @@ main .available-bird a:any-link {
   color: var(--bird-accent);
 }
 
-main .available-bird a:focus-visible {
+main .available-bird :is(a, button, input):focus-visible {
   outline: 3px solid var(--bird-accent);
   outline-offset: 5px;
+}
+
+main .available-bird .bird-sharing {
+  padding-top: 20px;
+  margin-top: 24px;
+  border-top: 1px solid #d5e0d9;
+}
+
+main .available-bird .bird-sharing-label {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+main .available-bird .bird-sharing-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+main .available-bird .bird-sharing button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bird-mist);
+  color: var(--bird-accent);
+}
+
+main .available-bird .bird-sharing .icon img {
+  display: block;
+}
+
+main .available-bird .bird-sharing button:hover {
+  background: #d5e0d9;
+}
+
+main .available-bird .bird-sharing button[aria-disabled="true"] {
+  background: var(--bird-mist);
+  cursor: wait;
+}
+
+main .available-bird .bird-sharing input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px;
+  margin-top: 12px;
+  border: 1px solid #859c90;
+  border-radius: 4px;
+  background: white;
+  color: var(--bird-ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+main .available-bird .bird-sharing-status {
+  min-height: 1.6em;
+  margin: 8px 0 0;
+  color: #52635b;
+  font-size: 14px;
+}
+
+main .available-bird .bird-sharing [hidden] {
+  display: none;
 }
 
 main .available-bird-wrapper:has(> .profile) + .default-content-wrapper {
