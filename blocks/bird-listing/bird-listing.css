@@ -1,0 +1,206 @@
+main .bird-listing {
+  --bird-ink: #163d39;
+  --bird-accent: #186c65;
+  --bird-mist: #edf5f0;
+
+  margin-top: 40px;
+  color: var(--bird-ink);
+  overflow-wrap: anywhere;
+}
+
+main .bird-listing .bird-filters {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+  border-radius: 8px;
+  background: var(--bird-mist);
+}
+
+main .bird-listing .bird-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+main .bird-listing label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+main .bird-listing input,
+main .bird-listing select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid #859c90;
+  border-radius: 4px;
+  background: white;
+  color: var(--bird-ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+main .bird-listing :is(input, select, button, a):focus-visible {
+  outline: 3px solid var(--bird-accent);
+  outline-offset: 4px;
+}
+
+main .bird-listing .bird-result-count {
+  margin-block: 24px;
+  font-size: 15px;
+}
+
+main .bird-listing .bird-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+main .bird-listing .bird-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid #d5e0d9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+}
+
+main .bird-listing .bird-card-photo {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  background: var(--bird-mist);
+  color: #52635b;
+  font-size: 16px;
+}
+
+main .bird-listing .bird-card-photo picture {
+  width: 100%;
+  height: 100%;
+}
+
+main .bird-listing .bird-card-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+main .bird-listing .bird-card-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: start;
+  padding: 24px;
+}
+
+main .bird-listing .bird-status {
+  margin: 0 0 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--bird-mist);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+main .bird-listing .status-pending {
+  background: #fff1d6;
+  color: #704b0c;
+}
+
+main .bird-listing h2 {
+  margin: 0 0 8px;
+  color: var(--bird-ink);
+  font-size: 32px;
+}
+
+main .bird-listing .bird-card-facts {
+  margin: 0;
+  color: #52635b;
+  font-size: 14px;
+}
+
+main .bird-listing .bird-card-description {
+  margin: 16px 0 24px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+main .bird-listing .bird-card-footer {
+  width: 100%;
+  padding-top: 20px;
+  margin-top: auto;
+  border-top: 1px solid #d5e0d9;
+}
+
+main .bird-listing .bird-card-fee {
+  margin: 0 0 10px;
+  color: #52635b;
+  font-size: 14px;
+}
+
+main .bird-listing .bird-card-link {
+  display: inline-block;
+  padding-block: 8px;
+  color: var(--bird-accent);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+main .bird-listing .bird-empty {
+  padding: 40px 24px;
+  border: 1px dashed #859c90;
+  border-radius: 8px;
+  text-align: center;
+}
+
+main .bird-listing .bird-empty p {
+  font-size: 16px;
+}
+
+main .bird-listing .bird-empty a {
+  display: block;
+  color: var(--bird-accent);
+  font-size: 16px;
+}
+
+main .bird-listing button {
+  min-height: 48px;
+  border: 2px solid var(--bird-accent);
+  border-radius: 4px;
+  background: var(--bird-accent);
+  color: white;
+}
+
+main .bird-listing button:hover {
+  background: var(--bird-ink);
+  color: white;
+}
+
+main .bird-listing [hidden] {
+  display: none;
+}
+
+@media (width >= 768px) {
+  main .bird-listing .bird-filters {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  main .bird-listing .bird-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 1200px) {
+  main .bird-listing .bird-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
