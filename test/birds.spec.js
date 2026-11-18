@@ -6,6 +6,7 @@ import { test, expect } from '@playwright/test';
 const fixtures = path.join(__dirname, 'fixtures');
 const index = JSON.parse(readFileSync(path.join(fixtures, 'bird-index.json'), 'utf8'));
 const profileHTML = readFileSync(path.join(fixtures, 'bird-profile.html'), 'utf8');
+const profileURL = 'https://www.heartlandavianrescueproject.org/adoption/birds/jon';
 
 async function mockIndex(page, data = index) {
   await page.route('**/bird-index.json?**', (route) => route.fulfill({ json: data }));
@@ -97,6 +98,83 @@ test('profile omits missing facts and handles a missing photo', async ({ page })
   await expectNoOverflow(page);
 });
 
+test('copy link uses the clean production canonical, not the preview URL', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', { value: undefined });
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: async (url) => { window.copiedProfileURL = url; } },
+    });
+  });
+  await page.route('**/test/bird-profile*', (route) => route.fulfill({
+    contentType: 'text/html; charset=utf-8',
+    body: profileHTML.replace(
+      `rel="canonical" href="${profileURL}"`,
+      `rel="canonical" href="${profileURL}?utm_source=preview#care"`,
+    ),
+  }));
+  await page.goto('/test/bird-profile?utm_source=social#care');
+  const sharing = page.getByRole('group', { name: "Share Jon's profile" });
+  await expect(sharing.getByRole('button', { name: 'Share profile' })).toHaveCount(0);
+  await sharing.getByRole('button', { name: 'Copy link' }).click();
+  await expect(sharing.getByRole('status')).toHaveText('Link copied.');
+  expect(await page.evaluate(() => window.copiedProfileURL)).toBe(profileURL);
+  await expect(sharing.getByRole('textbox', { name: 'Profile link' })).toBeHidden();
+  await expectNoOverflow(page);
+});
+
+test('native sharing uses social metadata and cancellation does not copy', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', {
+      value: async (data) => {
+        window.sharedProfile = data;
+        if (window.cancelSharing) throw new DOMException('Cancelled', 'AbortError');
+      },
+    });
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: async (url) => { window.copiedProfileURL = url; } },
+    });
+  });
+  await page.goto('/test/bird-profile?utm_source=social#care');
+  const sharing = page.getByRole('group', { name: "Share Jon's profile" });
+  const share = sharing.getByRole('button', { name: 'Share profile' });
+  await share.click();
+  await expect(share).toBeEnabled();
+  expect(await page.evaluate(() => window.sharedProfile)).toEqual({
+    title: 'Meet Jon, a green cheek conure | HARP',
+    text: 'Meet Jon, a young green cheek conure looking for a patient home through HARP in the Omaha, Lincoln, and Council Bluffs area.',
+    url: profileURL,
+  });
+  await page.evaluate(() => { window.cancelSharing = true; });
+  await share.click();
+  await expect(share).toBeEnabled();
+  expect(await page.evaluate(() => window.copiedProfileURL)).toBeUndefined();
+  await expect(sharing.getByRole('status')).toBeEmpty();
+  await sharing.getByRole('button', { name: 'Copy link' }).click();
+  await expect(sharing.getByRole('status')).toHaveText('Link copied.');
+});
+
+test('blocked share and clipboard access offer a selected link for manual copying', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', {
+      value: async () => { throw new DOMException('Sharing blocked', 'NotAllowedError'); },
+    });
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: async () => { throw new DOMException('Blocked', 'NotAllowedError'); } },
+    });
+  });
+  await page.goto('/test/bird-profile?utm_source=social#care');
+  const sharing = page.getByRole('group', { name: "Share Jon's profile" });
+  await sharing.getByRole('button', { name: 'Share profile' }).click();
+  const link = sharing.getByRole('textbox', { name: 'Profile link' });
+  await expect(link).toHaveValue(profileURL);
+  await expect(link).toBeFocused();
+  expect(await link.evaluate((input) => input.selectionEnd - input.selectionStart))
+    .toBe(profileURL.length);
+  await expect(sharing.getByRole('status'))
+    .toHaveText('Copy the selected link to share this profile.');
+  await expectNoOverflow(page);
+});
+
 [
   ['Pending', 'Adoption pending'],
   ['Adopted', 'Happily adopted'],
@@ -124,6 +202,7 @@ test('legacy biographies retain rich text and the existing application link', as
   await expect(bird.getByRole('img', { name: 'Jon' })).toBeVisible();
   await expect(bird).toContainText('$200');
   await expect(page.getByRole('link', { name: 'Apply Now' })).toBeVisible();
+  await expect(bird.locator('.bird-sharing')).toHaveCount(0);
   await expectNoOverflow(page);
 });
 
